@@ -29,6 +29,7 @@ def assert_file_sha1(hash_filename, hash_value):
         )
     else:
         print("Hash matches")
+        return True
 
 
 def get_file_from_path(base_directory, base_filename, base_sha1_sum):
