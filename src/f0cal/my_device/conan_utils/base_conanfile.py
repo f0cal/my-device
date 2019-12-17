@@ -4,6 +4,7 @@ import hashlib
 import shutil
 import types
 
+import yaml
 from conans import tools
 from conans import ConanFile as _ConanFile
 from conans.errors import ConanException
@@ -48,7 +49,7 @@ def get_file_from_path(base_directory, base_filename, base_sha1_sum):
 
 
 class ConanFile(_ConanFile):
-    _DEFAULT_INDEX = -1
+    _DEFAULT_INDEX = 'No Index Specified'
     _SPECIAL_PLACE = "img"
     _FIELD_TO_INDEX = "history"  # Note 1
     _INDEX_VAR = "F0CAL_INDEX"  # Note 2
@@ -57,15 +58,15 @@ class ConanFile(_ConanFile):
         super().__init__(output, runner, display_name, user, channel)
         # Conan loader.py requires name and version to be mutable, even though they aren't modified.
         self.name = self.conan_data["name"]
-        self.index = int(tools.get_env(
+        self.index = tools.get_env(
             self._INDEX_VAR,
-            default="__default__" in self.conan_data and self.conan_data["__default__"]
-        ))
-        self.version = self._conan_data(self.index).version
+            default=self.conan_data["__default__"]
+        )
+        self.version = self.index
 
-    def _conan_data(self, idx):
+    def _conan_data(self):
         _ = self.conan_data
-        _.update(self.conan_data["history"][idx])
+        _.update(self.conan_data["history"][self.index])
         return types.SimpleNamespace(**_)
 
     @property
@@ -90,7 +91,7 @@ class ConanFile(_ConanFile):
         Original URL for the base image. Keep this URL as a record of the source, even if the link becomes broken.
         :return: URL
         """
-        return self._conan_data(self.index).url
+        return self._conan_data().url
 
     @property
     def additional_urls(self):
@@ -98,7 +99,7 @@ class ConanFile(_ConanFile):
         Additional paths to the identical base image archive from mirrors and caches of the original URL.
         :return: URL
         """
-        return self._conan_data(self.index).additional_urls
+        return self._conan_data().additional_urls
 
     @property
     def download_filename(self):
@@ -119,14 +120,14 @@ class ConanFile(_ConanFile):
         if base_path:
             base_paths = base_path.split(':')
             for base_directory in base_paths:
-                if get_file_from_path(base_directory, self.output_filename, self._conan_data(self.index).output_hash):
+                if get_file_from_path(base_directory, self.output_filename, self._conan_data().output_hash):
                     found_base = True
                     break
                 if (
                         (self.output_filename is not self.download_filename)
                         and
                         get_file_from_path(base_directory, self.download_filename,
-                                           self._conan_data(self.index).download_hash)
+                                           self._conan_data().download_hash)
                 ):
                     found_base = True
         return found_base
@@ -174,7 +175,7 @@ class ConanFile(_ConanFile):
         # TODO: Consider this alternative from Brian, although:
         #       Doesn't support .xz archives such as for RasPi. Doesn't support download without decompress,
         #       so would need to rework this module, since we want to support use of local image or archive.
-        # _d = self._conan_data(self.index)
+        # _d = self._conan_data()
         # dargs = dict([(_d.hash_type, _d.hash)])
         # tools.get(_d.url, destination="img", **dargs)
 
@@ -184,7 +185,7 @@ class ConanFile(_ConanFile):
             if (
                     self.download_from_url(url)
                     and
-                    assert_file_sha1(f'{self.download_filename}.part', self._conan_data(self.index).download_hash)
+                    assert_file_sha1(f'{self.download_filename}.part', self._conan_data().download_hash)
             ):
                 success = True
                 break
@@ -208,7 +209,12 @@ class ConanFile(_ConanFile):
                 file_content = f.read()
                 fout.write(file_content)
                 os.remove(self.download_filename)
-        assert_file_sha1(self.output_filename, self._conan_data(self.index).output_hash)
+        assert_file_sha1(self.output_filename, self._conan_data().output_hash)
+
+        with open('conandata.yml') as f:
+            base_data = yaml.safe_load(f)
+        with open('f0cal_base.yml', 'w') as f:
+            yaml.dump({**base_data, 'index': self.index}, f)
 
     def package(self):
         if 'move' in dir(self):
@@ -223,7 +229,7 @@ class ConanFile(_ConanFile):
             print('**********************************************************************************')
             move_fn = self.copy
 
-        self.copy('conandata.yml', dst='.', keep_path=False)
+        self.copy('f0cal_base.yml', dst='.', keep_path=False)
         move_fn(self.output_filename, dst='bin', keep_path=False)
 
     def package_info(self):

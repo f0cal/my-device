@@ -9,7 +9,7 @@ from conans import ConanFile as _ConanFile
 
 
 class ConanFile(_ConanFile):
-    _DEFAULT_INDEX = -1
+    _DEFAULT_INDEX = 'No Index Specified'
     _SPECIAL_PLACE = "img"
     _FIELD_TO_INDEX = "history"  # Note 1
     _INDEX_VAR = "F0CAL_INDEX"  # Note 2
@@ -18,15 +18,15 @@ class ConanFile(_ConanFile):
         super().__init__(output, runner, display_name, user, channel)
         # Conan loader.py requires name and version to be mutable, even though they aren't modified.
         self.name = self.conan_data["name"]
-        self.index = int(tools.get_env(
+        self.index = tools.get_env(
             self._INDEX_VAR,
-            default="__default__" in self.conan_data and self.conan_data["__default__"]
-        ))
-        self.version = self._conan_data(self.index).version
+            default=self.conan_data["__default__"]
+        )
+        self.version = self.index
 
-    def _conan_data(self, index):
+    def _conan_data(self):
         _ = self.conan_data
-        _.update(self.conan_data["history"][index])
+        _.update(self.conan_data["history"][self.index])
         return types.SimpleNamespace(**_)
 
     @property
@@ -47,35 +47,35 @@ class ConanFile(_ConanFile):
 
     @property
     def url(self):
-        return self._conan_data(self.index).url
+        return self._conan_data().url
 
     @property
     def device_types(self):
-        return self._conan_data(self.index).device_types
+        return self._conan_data().device_types
 
     @property
     def dtb(self):
-        return self._conan_data(self.index).components['dtb']
+        return self._conan_data().components['dtb']
 
     @property
     def initrd(self):
-        return self._conan_data(self.index).components['initrd']
+        return self._conan_data().components['initrd']
 
     @property
     def kernel(self):
-        return self._conan_data(self.index).components['kernel']
+        return self._conan_data().components['kernel']
 
     @property
     def append(self):
-        return self._conan_data(self.index).components['append']
+        return self._conan_data().components['append']
 
     @property
     def base(self):
-        return self._conan_data(self.index).components['base']
+        return self._conan_data().components['base']
 
     @property
     def pxelinux(self):
-        return self._conan_data(self.index).components['pxelinux']
+        return self._conan_data().components['pxelinux']
 
     def requirements(self):
         # Requiring these only to ensure they are cached locally.
