@@ -109,3 +109,6 @@ class ConanFile(_ConanFile):
 
     def package(self):
         self.copy('f0cal.yml', '.')
+
+    def deploy(self):
+        self.copy('f0cal.yml', '.')
