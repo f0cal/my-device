@@ -6,6 +6,7 @@ import yaml
 
 from conans import tools
 from conans import ConanFile as _ConanFile
+from conans.model.values import Values
 
 
 class ConanFile(_ConanFile):
@@ -13,7 +14,8 @@ class ConanFile(_ConanFile):
     _SPECIAL_PLACE = "img"
     _FIELD_TO_INDEX = "history"  # Note 1
     _INDEX_VAR = "F0CAL_INDEX"  # Note 2
-
+    settings = []
+    options = []
     def __init__(self, output, runner, display_name, user, channel, **kwargs):
         super().__init__(output, runner, display_name, user, channel)
         # Conan loader.py requires name and version to be mutable, even though they aren't modified.
@@ -110,5 +112,8 @@ class ConanFile(_ConanFile):
     def package(self):
         self.copy('f0cal.yml', '.')
 
+
     def deploy(self):
         self.copy('f0cal.yml', '.')
+
+

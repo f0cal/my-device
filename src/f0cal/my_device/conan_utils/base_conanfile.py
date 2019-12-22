@@ -53,7 +53,8 @@ class ConanFile(_ConanFile):
     _SPECIAL_PLACE = "img"
     _FIELD_TO_INDEX = "history"  # Note 1
     _INDEX_VAR = "F0CAL_INDEX"  # Note 2
-
+    settings = []
+    options = []
     def __init__(self, output, runner, display_name, user, channel, **kwargs):
         super().__init__(output, runner, display_name, user, channel)
         # Conan loader.py requires name and version to be mutable, even though they aren't modified.
