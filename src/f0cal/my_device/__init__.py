@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from pkg_resources import get_distribution, DistributionNotFound
+import os
+import f0cal
 
 try:
     # Change here if project is renamed and does not equal the package name
@@ -9,3 +11,12 @@ except DistributionNotFound:
     __version__ = 'unknown'
 finally:
     del get_distribution, DistributionNotFound
+
+
+def configure_conan():
+    os.system("conan remote add f0cal-images https://api.bintray.com/conan/f0cal/images")
+
+
+@f0cal.plugin(name="my-device", sets="ini")
+def ini(user_home, hook_name):
+    configure_conan()
