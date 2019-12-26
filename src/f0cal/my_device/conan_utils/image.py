@@ -19,8 +19,7 @@ class Image:
     def info(self):
         # TODO there are probably way to get the info without installing the package however that will get us the info
         # and will not reinstall if installed already
-        return Conan().install_reference(self.conanfile_ref)
-
+        return self._conan_install()
     @property
     @functools.lru_cache()
     def f0cal_img_info(self):
@@ -34,6 +33,8 @@ class Image:
     def __init__(self, reference):
         self.conanfile_ref = reference
 
+    def _conan_install(self):
+        return Conan().install_reference(self.conanfile_ref, build=['missing'])
 
     def mount_base_image(self):
         ''' This function should take the components listed in the yaml file as well the corresponding salt recipe to
