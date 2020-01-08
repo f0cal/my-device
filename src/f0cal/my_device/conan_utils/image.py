@@ -58,7 +58,7 @@ class Image:
 
     @classmethod
     def _saltbox_run(cls, cmd, pillar, saltenv=None, **kwargs):
-        config = saltbox.SaltBoxConfig.from_env(block=False, master=True)
+        config = saltbox.SaltBoxConfig.from_env(block=False)
         pillar_json = json.dumps(pillar)
         with saltbox.SaltBox.executor_factory(config) as api:
             api.execute(*cmd, f'saltenv={saltenv}', f'pillar={pillar_json}')
