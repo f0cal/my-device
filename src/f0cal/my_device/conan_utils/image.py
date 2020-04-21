@@ -6,13 +6,18 @@ import functools
 import os
 from conans.model.ref import ConanFileReference
 from conans.client.conan_api import Conan
+import subprocess
 class Image:
     IMAGE_MANIFEST_FILE = 'f0cal.yml'
 
+    def __init__(self, reference, device_type=None):
+        self.conanfile_ref = reference
+        self.device_type = device_type
+
     @classmethod
-    def from_reference(cls, reference_string):
+    def from_reference(cls, reference_string, device_type=None):
         reference = ConanFileReference.loads(reference_string)
-        return cls(reference)
+        return cls(reference, device_type=device_type)
 
     @property
     @functools.lru_cache()
@@ -32,11 +37,11 @@ class Image:
         img_info['img_file'] = os.path.join(package_dir, img_info['img_file'])
         return img_info
 
-    def __init__(self, reference):
-        self.conanfile_ref = reference
-
     def _conan_install(self):
-        return Conan().install_reference(self.conanfile_ref, build=['missing'])
+        kwargs = {'build':['missing']}
+        if self.device_type is not None:
+            kwargs.update({'options': [f'device_type={self.device_type}']})
+        return Conan().install_reference(self.conanfile_ref, **kwargs )
 
     def mount_base_image(self):
         ''' This function should take the components listed in the yaml file as well the corresponding salt recipe to
