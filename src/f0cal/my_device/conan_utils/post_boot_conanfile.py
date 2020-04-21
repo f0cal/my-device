@@ -3,7 +3,6 @@ import uuid
 from f0cal.services.device_farm.verbs.instance import InstanceScheduler
 from f0cal.services.device_farm.instance_factories import PxeBootFactory, SelfFlashFactory
 from f0cal.services.device_farm import models
-from conans import ConanFile
 import os
 
 
@@ -20,11 +19,15 @@ class MetaClient:
             "Post boot workflows only supported with local client. Please create this Image on the device farm")
 
 
-class ConanFile(ConanFile):
+class ConanFile(_ConanFile):
     BASE_IMAGE = None
-    # TODO GET THIS FROM CONANDATA.YML
-    options = {'device_type': []}
     requires = BASE_IMAGE
+    def source(self):
+        pass
+
+    @property
+    def filename(self):
+        return self._conan_data().filename
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -42,4 +45,4 @@ class ConanFile(ConanFile):
         self.post_boot()
 
     def package(self):
-        self.instance.save(os.path.join(self.package_folder, f'{self.name}_{self.version}.img'))
+        self.instance.save(os.path.join(self.package_folder, self.filename))
