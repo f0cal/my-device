@@ -4,7 +4,7 @@ from f0cal.services.device_farm.verbs.instance import InstanceScheduler
 from f0cal.services.device_farm.instance_factories import PxeBootFactory, SelfFlashFactory
 from f0cal.services.device_farm import models
 import os
-
+import yaml
 
 class MetaClient:
     @classmethod
@@ -25,10 +25,6 @@ class ConanFile(_ConanFile):
     def source(self):
         pass
 
-    @property
-    def filename(self):
-        return self._conan_data().filename
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.instance = None
@@ -43,6 +39,9 @@ class ConanFile(_ConanFile):
     def build(self):
         self.boot()
         self.post_boot()
+        with open('f0cal.yml', 'w') as f:
+            yaml.dump(self.f0cal_yml, f)
 
     def package(self):
+        self.copy('f0cal.yml')
         self.instance.save(os.path.join(self.package_folder, self.filename))

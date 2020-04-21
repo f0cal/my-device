@@ -72,6 +72,23 @@ class ConanFile(_ConanFile):
         return types.SimpleNamespace(**_)
 
     @property
+    def filename(self):
+        return self._conan_data().filename
+
+    @property
+    def full_name(self):
+        return f'{self.name}/{self.version}@{self.user}/{self.channel}'
+
+    @property
+    def f0cal_yml(self):
+        return {
+            'img_file': self.filename,
+            'admin_user': self._conan_data().admin_user,
+            'admin_password': self._conan_data().admin_password, 
+            'parts': self._conan_data().parts,
+            'salt_interface': self._conan_data().salt_interface
+        }
+    @property
     def _options(self):
         supported_devices = self._conan_data().device_types
         options = {'device_type': supported_devices}
