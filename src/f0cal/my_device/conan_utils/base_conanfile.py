@@ -54,7 +54,7 @@ class ConanFile(_ConanFile):
     _FIELD_TO_INDEX = "history"  # Note 1
     _INDEX_VAR = "F0CAL_INDEX"  # Note 2
     settings = []
-    options = []
+
     def __init__(self, output, runner, display_name, user, channel, **kwargs):
         super().__init__(output, runner, display_name, user, channel)
         # Conan loader.py requires name and version to be mutable, even though they aren't modified.
@@ -64,11 +64,35 @@ class ConanFile(_ConanFile):
             default=self.conan_data["__default__"]
         )
         self.version = self.index
+        self.options = self._options
 
     def _conan_data(self):
         _ = self.conan_data
         _.update(self.conan_data["history"][self.index])
         return types.SimpleNamespace(**_)
+
+    @property
+    def filename(self):
+        return self._conan_data().filename
+
+    @property
+    def full_name(self):
+        return f'{self.name}/{self.version}@{self.user}/{self.channel}'
+
+    @property
+    def f0cal_yml(self):
+        return {
+            'img_file': self.filename,
+            'admin_user': self._conan_data().admin_user,
+            'admin_password': self._conan_data().admin_password, 
+            'parts': self._conan_data().parts,
+            'salt_interface': self._conan_data().salt_interface
+        }
+    @property
+    def _options(self):
+        supported_devices = self._conan_data().device_types
+        options = {'device_type': supported_devices}
+        return options
 
     @property
     def author(self):
