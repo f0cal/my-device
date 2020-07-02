@@ -27,20 +27,28 @@ class Image:
         return self._conan_install()
     @property
     @functools.lru_cache()
-    def f0cal_img_info(self):
+    def _f0cal_img_info(self):
         # A little hacky makes the assumption that each image will have a f0cal.yml and that the conan info is
         # structered in a certain way
         package_dir = self.info['installed'][0]['packages'][0]['cpp_info']['rootpath']
         with open(os.path.join(package_dir, self.IMAGE_MANIFEST_FILE)) as f:
             img_info = yaml.load(f)
-        # The f0cal.yml only states the image file relative to the package directory
+        return img_info
+
+    @property
+    @functools.lru_cache()
+    def f0cal_img_info(self):
+        img_info = self._f0cal_img_info
+        # The f0cal.yml only states the image file relative to the package directory we update this here
+        package_dir = self.info['installed'][0]['packages'][0]['cpp_info']['rootpath']
         img_info['img_file'] = os.path.join(package_dir, img_info['img_file'])
         return img_info
 
     def _conan_install(self):
         kwargs = {'build':['missing']}
-        if self.device_type is not None:
-            kwargs.update({'options': [f'device_type={self.device_type}']})
+        # options = Conan().inspect(str(self.conanfile_ref), None)['options']
+        # if self.device_type is not None: # and 'device_type' in options:
+        #     kwargs.update({'options': [f'device_type={self.device_type}']})
         return Conan().install_reference(self.conanfile_ref, **kwargs )
 
     def mount_base_image(self):

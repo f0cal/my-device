@@ -54,6 +54,7 @@ class ConanFile(_ConanFile):
     _FIELD_TO_INDEX = "history"  # Note 1
     _INDEX_VAR = "F0CAL_INDEX"  # Note 2
     settings = []
+    options = []
 
     def __init__(self, output, runner, display_name, user, channel, **kwargs):
         super().__init__(output, runner, display_name, user, channel)
@@ -64,7 +65,9 @@ class ConanFile(_ConanFile):
             default=self.conan_data["__default__"]
         )
         self.version = self.index
-        self.options = self._options
+        # TODO THIS IS A HACK FOR UPDATEING THE CONAN DATA. THIS CODE ALL NEEDS TO GET REFACTORED
+        self._conan_data()
+
 
     def _conan_data(self):
         _ = self.conan_data
