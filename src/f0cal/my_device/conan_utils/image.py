@@ -10,14 +10,13 @@ import subprocess
 class Image:
     IMAGE_MANIFEST_FILE = 'f0cal.yml'
 
-    def __init__(self, reference, device_type=None):
+    def __init__(self, reference):
         self.conanfile_ref = reference
-        self.device_type = device_type
 
     @classmethod
-    def from_reference(cls, reference_string, device_type=None):
+    def from_reference(cls, reference_string):
         reference = ConanFileReference.loads(reference_string)
-        return cls(reference, device_type=device_type)
+        return cls(reference)
 
     @property
     @functools.lru_cache()
@@ -28,8 +27,6 @@ class Image:
     @property
     @functools.lru_cache()
     def _f0cal_img_info(self):
-        # A little hacky makes the assumption that each image will have a f0cal.yml and that the conan info is
-        # structered in a certain way
         package_dir = self.info['installed'][0]['packages'][0]['cpp_info']['rootpath']
         with open(os.path.join(package_dir, self.IMAGE_MANIFEST_FILE)) as f:
             img_info = yaml.load(f)

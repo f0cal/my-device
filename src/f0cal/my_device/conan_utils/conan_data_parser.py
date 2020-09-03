@@ -1,23 +1,12 @@
 import yaml
 
 
-class ConanData:
-    def __init__(self, path):
-        with open(path) as f:
-            self._all_data = yaml.load(f)
-
-    @property
-    def _default_version(self):
-        return self._all_data['__default__']
-
-    @property
-    def data(self):
-        return self._all_data['history'][self._default_version]
-
-    @property
-    def _admin_user(self):
-        return self.data['admin_user']
-
-    @property
-    def _admin_password(self):
-        return self.data['admin_password']
+# TODO USE A PROPER JSON/YAML SCHEMA HERE
+class ConanDataValidator:
+    @classmethod
+    def validate(cls, conandata, expected_keys):
+        conandata_keys = set(conandata.keys())
+        if not conandata_keys.issuperset(expected_keys):
+            raise Exception(
+                f'The following required keys are missing from conandata.yml:\n {expected_keys.difference(conandata_keys)}')
+        return True
