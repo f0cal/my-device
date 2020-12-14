@@ -17,6 +17,6 @@ def configure_conan():
     os.system("conan remote add f0cal-images https://api.bintray.com/conan/f0cal/images")
 
 
-@f0cal.plugin(name="my-device", sets="ini")
+@f0cal.core.plugin(name="my-device", sets="ini")
 def ini(user_home, hook_name):
     configure_conan()
