@@ -10,7 +10,7 @@
 import sys
 
 from pkg_resources import VersionConflict, require
-from setuptools import setup, find_namespace_packages
+from setuptools import setup
 
 try:
     require('setuptools>=38.3')
@@ -20,5 +20,4 @@ except VersionConflict:
 
 
 if __name__ == "__main__":
-    setup(use_pyscaffold=True,
-          packages=find_namespace_packages(include=['f0cal.*']))
+    setup(use_pyscaffold=True)
