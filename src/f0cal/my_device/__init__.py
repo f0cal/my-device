@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from pkg_resources import get_distribution, DistributionNotFound
 import os
-import f0cal
+import f0cal.core
 
 try:
     # Change here if project is renamed and does not equal the package name

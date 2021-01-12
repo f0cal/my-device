@@ -1,6 +1,6 @@
 import yaml
 import json
-import f0cal
+import f0cal.core
 import saltbox
 import functools
 import os
