@@ -1,6 +1,6 @@
 import yaml
 import json
-import f0cal
+import f0cal.core
 import saltbox
 import functools
 import os
@@ -76,7 +76,7 @@ class Image:
 def base_image_create_args(parser):
     parser.add_argument('reference_string')
 
-@f0cal.entrypoint(['my-device', 'image', 'mount'], args = base_image_create_args)
+@f0cal.core.entrypoint(['my-device', 'image', 'mount'], args = base_image_create_args)
 def mount_base_image(parser, core, reference_string ):
     img = Image.from_reference(reference_string)
     img.mount_base_image()
