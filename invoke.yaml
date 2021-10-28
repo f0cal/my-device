@@ -2,3 +2,19 @@ python.docker-build:
   image:
     start: python:3.7-slim
     end: f0cal/my-device:build
+
+make-like:
+  define:
+
+    my-device/sanity.check:
+      inv: sanity.check
+
+    my-device/python.push:
+      inv: python.docker-push
+      depends:
+        - my-device/sanity.check
+
+    my-device/utest:
+      inv: python.docker-test
+      depends:
+        - core2/python.push
