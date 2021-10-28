@@ -29,7 +29,7 @@ class Image:
     def _f0cal_img_info(self):
         package_dir = self.info['installed'][0]['packages'][0]['cpp_info']['rootpath']
         with open(os.path.join(package_dir, self.IMAGE_MANIFEST_FILE)) as f:
-            img_info = yaml.load(f)
+            img_info = yaml.safe_load(f)
         return img_info
 
     @property
